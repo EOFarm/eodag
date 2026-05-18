@@ -83,7 +83,7 @@ ecmwf = [
     "ecmwf-api-client",
 ]
 usgs = [
-    "usgs >= 0.3.6",
+    "usgs >= 0.3.7",
 ]
 notebook = [
     "tqdm[notebook]",
