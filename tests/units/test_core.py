@@ -153,6 +153,24 @@ class TestCore(TestCoreBase):
         "DT_EXTREMES": ["dedl", "dedt_lumi"],
         "DT_CLIMATE_G1_HIGHRESMIP_CONT_IFS_FESOM_R1": ["dedt_mn5"],
         "DT_CLIMATE_G1_SCENARIOMIP_SSP3_7_0_IFS_FESOM_R1": ["dedt_mn5"],
+        "DT_CLIMATE_G2_BASELINE_CONT_IFS_NEMO_R1": ["dedt_mn5"],
+        "DT_CLIMATE_G2_BASELINE_HIST_IFS_NEMO_R1": ["dedt_mn5"],
+        "DT_CLIMATE_G2_PROJECTIONS_SSP3_7_0_IFS_NEMO_R1": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_CONT_IFS_FESOM_R1": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_CONT_IFS_FESOM_R2": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_CONT_IFS_FESOM_R3": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_CONT_IFS_FESOM_R4": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_CONT_IFS_FESOM_R5": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_HIST_IFS_FESOM_R1": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_HIST_IFS_FESOM_R2": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_HIST_IFS_FESOM_R3": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_HIST_IFS_FESOM_R4": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_HIST_IFS_FESOM_R5": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_TPLUS2_0K_IFS_FESOM_R1": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_TPLUS2_0K_IFS_FESOM_R2": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_TPLUS2_0K_IFS_FESOM_R3": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_TPLUS2_0K_IFS_FESOM_R4": ["dedt_mn5"],
+        "DT_CLIMATE_G2_STORY_NUDGING_TPLUS2_0K_IFS_FESOM_R5": ["dedt_mn5"],
         "DT_CLIMATE_G1_CMIP6_HIST_ICON_R1": ["dedt_lumi"],
         "DT_CLIMATE_G1_CMIP6_HIST_IFS_NEMO_R1": ["dedt_lumi"],
         "DT_CLIMATE_G1_HIGHRESMIP_CONT_IFS_NEMO_R1": ["dedt_lumi"],
@@ -163,6 +181,12 @@ class TestCore(TestCoreBase):
         "DT_CLIMATE_G1_STORY_NUDGING_TPLUS2_0K_IFS_FESOM_R1": ["dedt_lumi"],
         "DT_CLIMATE_G1_CMIP6_HIST_IFS_FESOM_R1": ["dedt_lumi"],
         "DT_CLIMATE_G1_SCENARIOMIP_SSP3_7_0_IFS_FESOM_R2": ["dedt_lumi"],
+        "DT_CLIMATE_G2_BASELINE_CONT_ICON_R1": ["dedt_lumi"],
+        "DT_CLIMATE_G2_BASELINE_CONT_IFS_FESOM_R1": ["dedt_lumi"],
+        "DT_CLIMATE_G2_BASELINE_HIST_ICON_R1": ["dedt_lumi"],
+        "DT_CLIMATE_G2_BASELINE_HIST_IFS_FESOM_R1": ["dedt_lumi"],
+        "DT_CLIMATE_G2_PROJECTIONS_SSP3_7_0_ICON_R1": ["dedt_lumi"],
+        "DT_CLIMATE_G2_PROJECTIONS_SSP3_7_0_IFS_FESOM_R1": ["dedt_lumi"],
         "EEA_HRL_TCF": ["wekeo_main"],
         "EFAS_FORECAST": ["cop_ewds", "dedl"],
         "EFAS_HISTORICAL": ["cop_ewds", "dedl"],
@@ -1912,6 +1936,14 @@ class TestCore(TestCoreBase):
             collection="S2_MSI_L1C", provider="sara"
         )
         self.assertTrue(item_sara_queryables.additional_properties)
+
+        # `start`/`end` from Queryables (aliased to `start_datetime`/`end_datetime`)
+        # must shadow `start_datetime`/`end_datetime` from CommonStacMetadata so that
+        # only the canonical short names are exposed as queryables.
+        self.assertIn("start", item_sara_queryables)
+        self.assertIn("end", item_sara_queryables)
+        self.assertNotIn("start_datetime", item_sara_queryables)
+        self.assertNotIn("end_datetime", item_sara_queryables)
 
         # additional_properties set to False for EcmwfSearch plugin
         cop_cds_queryables = self.dag.list_queryables(provider="cop_cds")

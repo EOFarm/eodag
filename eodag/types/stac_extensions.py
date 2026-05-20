@@ -509,7 +509,7 @@ class EcmwfItemProperties(BaseModel):
     ecmwf_area: Annotated[Union[str, list[float]], Field(None)]
     ecmwf_block: Annotated[str, Field(None)]
     ecmwf_channel: Annotated[str, Field(None)]
-    ecmwf_class: Optional[str] = Field(default=None, alias="class")
+    ecmwf_class: Optional[str] = Field(default=None)
     ecmwf_dataset: Annotated[str, Field(None)]
     ecmwf_date: Annotated[str, Field(None)]
     ecmwf_diagnostic: Annotated[str, Field(None)]
@@ -625,19 +625,17 @@ class EcmwfItemProperties(BaseModel):
     ecmwf_location: Annotated[dict[str, int], Field(None)]
 
 
-class EcmwfExtension(BaseStacExtension):
-    """STAC SAR extension."""
+class ProviderStacExtension(BaseStacExtension):
+    """Base class for provider-specific STAC extensions.
 
-    FIELDS: type[BaseModel] = EcmwfItemProperties
-
-    field_name_prefix: Optional[str] = "ecmwf"
+    Sets up field aliases so each field accepts both the stac-prefixed
+    (e.g. ``usgs:scene_filter``) and the no-prefix (e.g. ``scene_filter``)
+    forms as input, while serializing as the stac-prefixed form.
+    """
 
     @model_validator(mode="after")
-    def setup_field_aliases(self) -> "EcmwfExtension":
-        """Set up aliases for ECMWF fields, accepting both stac-prefixed and
-        no-prefix forms (e.g. 'ecmwf:data_format' and 'data_format') as input,
-        while serializing as the stac-prefixed form.
-        """
+    def setup_field_aliases(self) -> "ProviderStacExtension":
+        """Set up dual (prefixed/unprefixed) aliases on extension fields."""
         if self.field_name_prefix is None:
             return self
 
@@ -652,6 +650,30 @@ class EcmwfExtension(BaseStacExtension):
             v.serialization_alias = prefixed
             v.metadata.insert(0, {"extension": self.__class__.__name__})
         return self
+
+
+class EcmwfExtension(ProviderStacExtension):
+    """STAC ECMWF extension."""
+
+    FIELDS: type[BaseModel] = EcmwfItemProperties
+
+    field_name_prefix: Optional[str] = "ecmwf"
+
+
+class UsgsFields(BaseModel):
+    """Custom fields for usgs provider."""
+
+    usgs_ingest_after: Annotated[str, Field(None)]
+    usgs_ingest_before: Annotated[str, Field(None)]
+    usgs_scene_filter: Annotated[dict[str, Any], Field(None)]
+
+
+class UsgsExtension(ProviderStacExtension):
+    """Custom extension for provider usgs."""
+
+    FIELDS: type[BaseModel] = UsgsFields
+
+    field_name_prefix: Optional[str] = "usgs"
 
 
 STAC_EXTENSIONS = [
@@ -673,4 +695,5 @@ STAC_EXTENSIONS = [
     LabelExtension(),
     FederationExtension(),
     EcmwfExtension(),
+    UsgsExtension(),
 ]
